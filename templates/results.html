@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Validation Report #{{ run.id }} &mdash; DataCheck{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <h1 class="page-title">Validation Report #{{ run.id }}</h1>
+      {% if run.total_errors == 0 %}
+        <span class="badge badge-clean">&#x2714; Clean Dataset</span>
+      {% else %}
+        <span class="badge badge-errors">&#x26A0; {{ run.total_errors }} Errors Detected</span>
+      {% endif %}
+    </div>
+    <p class="page-subtitle">
+      File: <strong>{{ run.filename }}</strong> &bull; Size: {{ run.file_size_kb }} KB &bull; Tested on: {{ run.uploaded_at }}
+    </p>
+  </div>
+
+  <div class="btn-group">
+    <a href="{{ url_for('export_report', run_id=run.id) }}" class="btn btn-primary">
+      &#x2913; Download Report (.csv)
+    </a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
+      &larr; Upload Another File
+    </a>
+  </div>
+</div>
+
+<!-- Summary Metric Cards -->
+<div class="stats-grid">
+  <div class="stat-card stat-total">
+    <span class="stat-label">Total Rows Analyzed</span>
+    <span class="stat-value">{{ run.total_rows }}</span>
+  </div>
+  <div class="stat-card stat-valid">
+    <span class="stat-label">Valid Rows (Pass)</span>
+    <span class="stat-value">{{ run.valid_rows }}</span>
+  </div>
+  <div class="stat-card stat-invalid">
+    <span class="stat-label">Invalid Rows (Failed)</span>
+    <span class="stat-value">{{ run.invalid_rows }}</span>
+  </div>
+  <div class="stat-card stat-errors">
+    <span class="stat-label">Total Errors Logged</span>
+    <span class="stat-value">{{ run.total_errors }}</span>
+  </div>
+</div>
+
+<!-- Error Distribution Summary Chips -->
+{% if error_summary %}
+  <div class="card" style="padding: 1.25rem;">
+    <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-muted);">
+      Error Breakdown by Category:
+    </h3>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      {% for item in error_summary %}
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 0.4rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.88rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="badge 
+            {% if 'Missing' in item.error_type %}badge-missing
+            {% elif 'Duplicate' in item.error_type %}badge-duplicate
+            {% elif 'Type' in item.error_type %}badge-type
+            {% elif 'Range' in item.error_type %}badge-range
+            {% elif 'Format' in item.error_type %}badge-format
+            {% else %}badge-category{% endif %}">
+            {{ item.error_type }}
+          </span>
+          <strong style="color: var(--text-main);">{{ item.count }}</strong>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+<!-- Errors Detailed Table Section -->
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+    <h2 class="card-title" style="margin-bottom: 0;">
+      <span>&#x1F4CB;</span>
+      <span>Detected Import Errors</span>
+    </h2>
+    <span style="font-size: 0.85rem; color: var(--text-muted);">
+      Showing <strong id="visibleErrorCount">{{ errors|length }}</strong> of {{ run.total_errors }} errors
+    </span>
+  </div>
+
+  {% if errors %}
+    <!-- Filter and Search Controls -->
+    <div class="filter-bar">
+      <input type="text" id="tableSearch" class="filter-input" placeholder="Search by row, column, value, or suggestion...">
+      <select id="errorTypeFilter" class="filter-select">
+        <option value="all">All Error Types</option>
+        {% for item in error_summary %}
+          <option value="{{ item.error_type }}">{{ item.error_type }} ({{ item.count }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="table-responsive">
+      <table id="errorTable">
+        <thead>
+          <tr>
+            <th style="width: 80px;">Row #</th>
+            <th style="width: 140px;">Column Name</th>
+            <th style="width: 170px;">Incorrect Value</th>
+            <th style="width: 160px;">Error Type</th>
+            <th>Suggested Correction</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for error in errors %}
+            <tr data-error-type="{{ error.error_type }}">
+              <td><strong>#{{ error.row_number }}</strong></td>
+              <td><code>{{ error.column_name }}</code></td>
+              <td>
+                {% if error.invalid_value == '' or error.invalid_value == None %}
+                  <em style="color: var(--text-muted);">&lt;Empty&gt;</em>
+                {% else %}
+                  <span style="color: var(--danger); font-family: ui-monospace, monospace; font-weight: 500;">
+                    {{ error.invalid_value }}
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge 
+                  {% if 'Missing' in error.error_type %}badge-missing
+                  {% elif 'Duplicate' in error.error_type %}badge-duplicate
+                  {% elif 'Type' in error.error_type %}badge-type
+                  {% elif 'Range' in error.error_type %}badge-range
+                  {% elif 'Format' in error.error_type %}badge-format
+                  {% else %}badge-category{% endif %}">
+                  {{ error.error_type }}
+                </span>
+              </td>
+              <td>
+                <span style="color: #334155;">{{ error.suggested_correction }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon" style="color: var(--success);">&#x2714;</div>
+      <h3 style="color: var(--success);">Zero Errors Found!</h3>
+      <p style="margin-top: 0.25rem;">Every record in this dataset complied fully with all data type, range, uniqueness, and format constraints.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

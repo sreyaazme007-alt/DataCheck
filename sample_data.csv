@@ -1,0 +1,17 @@
+Student_ID,Full_Name,Email,Age,Department,CGPA,Enrollment_Date
+101,Aarav Sharma,aarav.sharma@example.com,20,CSE,8.75,2023-08-15
+102,Diya Patel,diya.patel@example.com,19,ECE,9.10,2023-08-16
+103,Rohan Verma,,21,IT,7.80,2022-08-10
+104,,ananya.iyer@example.com,20,CSE,8.90,2023-08-15
+105,Vikram Singh,vikram.singh_at_example.com,22,MECH,6.95,2021-08-20
+106,Sneha Rao,sneha.rao@example.com,twenty,CIVIL,7.50,2022-08-18
+107,Kavya Nair,kavya.nair@example.com,19,AIDS,12.50,2023-08-15
+108,Rahul Gupta,rahul.gupta@example.com,-5,CSE,8.20,2023-08-15
+109,Meera Joshi,meera.joshi@example.com,21,ROBOTICS,8.45,2022-08-12
+110,Arjun Das,arjun.das@example.com,20,ECE,7.90,15-08-2023
+102,Pooja Hegde,pooja.hegde@example.com,20,CSE,8.60,2023-08-15
+101,Aarav Sharma,aarav.sharma@example.com,20,CSE,8.75,2023-08-15
+111,Karan Malhotra,karan.m@example.com,22,IT,9.40,2022-08-11
+112,Tanvi Deshmukh,tanvi.d@example.com,20,CIVIL,-1.50,2023-08-17
+113,Siddharth Sen,siddharth@example,21,MECH,7.20,2022-08-14
+114,Rhea Kapoor,rhea.kapoor@example.com,19,CSE,8.15,2023-08-15

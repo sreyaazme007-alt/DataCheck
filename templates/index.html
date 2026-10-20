@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}DataCheck &mdash; Data Import Error Detector{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">DataCheck &mdash; Data Import Error Detector</h1>
+  <p class="page-subtitle">
+    Automated pre-import validation engine for relational databases. Detect missing values, duplicate primary keys, type mismatches, syntax errors, and out-of-range values in your CSV datasets instantly.
+  </p>
+</div>
+
+<!-- Overall System Stats -->
+<div class="stats-grid">
+  <div class="stat-card stat-total">
+    <span class="stat-label">Files Analyzed</span>
+    <span class="stat-value">{{ system_stats.total_runs }}</span>
+  </div>
+  <div class="stat-card stat-valid">
+    <span class="stat-label">Total Rows Scanned</span>
+    <span class="stat-value">{{ system_stats.total_rows_scanned }}</span>
+  </div>
+  <div class="stat-card stat-invalid">
+    <span class="stat-label">Valid Rows (Passed)</span>
+    <span class="stat-value">{{ system_stats.total_valid_rows }}</span>
+  </div>
+  <div class="stat-card stat-errors">
+    <span class="stat-label">Errors Detected</span>
+    <span class="stat-value">{{ system_stats.total_errors_caught }}</span>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Upload Section -->
+  <div class="card">
+    <h2 class="card-title">
+      <span>&#x1F4E4;</span>
+      <span>Upload CSV File for Validation</span>
+    </h2>
+    <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.25rem;">
+      Select or drag-and-drop a CSV file to scan for data anomalies, duplicate records, and integrity issues.
+    </p>
+
+    <form id="uploadForm" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">&#x1F4C1;</div>
+        <div class="dropzone-text">Drag and drop your CSV file here</div>
+        <div class="dropzone-sub">or click to browse from your computer (.csv files only)</div>
+        <input type="file" id="fileInput" name="file" accept=".csv" style="display: none;" required>
+        
+        <div id="fileInfo" class="file-info">
+          &#x2714; Selected: <span id="fileNameDisplay"></span>
+        </div>
+      </div>
+
+      <div class="manual-file-select" style="margin-top: 1rem; text-align: center;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Having trouble dragging? </span>
+        <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;" onclick="document.getElementById('fileInput').click();">
+          Browse File
+        </button>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <button type="submit" id="submitBtn" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 1.5rem;">
+          &#x2714; Validate Dataset
+        </button>
+        <a href="{{ url_for('download_sample') }}" class="btn btn-outline" title="Download testing CSV with valid &amp; invalid rows">
+          &#x2913; Download Sample CSV
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Validation Rules Reference Card -->
+  <div class="card">
+    <h2 class="card-title">
+      <span>&#x1F6E1;</span>
+      <span>Enforced Schema &amp; Rules</span>
+    </h2>
+    <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+      DataCheck uses deterministic rule algorithms to evaluate every row against strict constraints:
+    </p>
+
+    <ul class="rule-list">
+      <li class="rule-item">
+        <span class="rule-badge">Student_ID</span>
+        <span><strong>Primary Key &amp; Unique</strong>. Must be a positive integer; duplicate keys are flagged.</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">Full_Name</span>
+        <span><strong>Mandatory</strong>. Cannot be empty, null, or contain illegal characters.</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">Email</span>
+        <span><strong>RFC-822 Regex Format</strong>. Validates syntax (<code>user@domain.tld</code>).</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">Age</span>
+        <span><strong>Range (16 &ndash; 100)</strong>. Integer type and domain bounds check.</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">Department</span>
+        <span><strong>Permitted Enum</strong>. Allowed: <code>CSE</code>, <code>ECE</code>, <code>IT</code>, <code>MECH</code>, <code>CIVIL</code>, <code>AIDS</code>.</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">CGPA</span>
+        <span><strong>Range (0.00 &ndash; 10.00)</strong>. Numeric floating-point check.</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">Enrollment_Date</span>
+        <span><strong>ISO 8601 Date</strong>. Enforces valid <code>YYYY-MM-DD</code> calendar dates.</span>
+      </li>
+      <li class="rule-item">
+        <span class="rule-badge">Deduplication</span>
+        <span><strong>Full Row Hashing</strong>. Identifies duplicate rows across the entire dataset.</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Recent Validation History Table -->
+<div class="card" style="margin-top: 1.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+    <h2 class="card-title" style="margin-bottom: 0;">
+      <span>&#x23F1;</span>
+      <span>Recent Validation Runs</span>
+    </h2>
+    <a href="{{ url_for('history') }}" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
+      View All History &rarr;
+    </a>
+  </div>
+
+  {% if recent_runs %}
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Run #</th>
+            <th>Filename</th>
+            <th>Uploaded At</th>
+            <th>Total Rows</th>
+            <th>Valid</th>
+            <th>Invalid</th>
+            <th>Errors</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for run in recent_runs %}
+            <tr>
+              <td>#{{ run.id }}</td>
+              <td><strong>{{ run.filename }}</strong></td>
+              <td>{{ run.uploaded_at }}</td>
+              <td>{{ run.total_rows }}</td>
+              <td><span style="color: var(--success); font-weight: 600;">{{ run.valid_rows }}</span></td>
+              <td><span style="color: var(--warning); font-weight: 600;">{{ run.invalid_rows }}</span></td>
+              <td>
+                {% if run.total_errors == 0 %}
+                  <span style="color: var(--success); font-weight: 600;">0</span>
+                {% else %}
+                  <span style="color: var(--danger); font-weight: 600;">{{ run.total_errors }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if run.status == 'Clean' or run.total_errors == 0 %}
+                  <span class="badge badge-clean">&#x2714; Clean</span>
+                {% else %}
+                  <span class="badge badge-errors">&#x26A0; Errors Detected</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a href="{{ url_for('view_run', run_id=run.id) }}" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.25rem 0.6rem;">
+                    View Report
+                  </a>
+                  <a href="{{ url_for('export_report', run_id=run.id) }}" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.25rem 0.6rem;" title="Download CSV Report">
+                    Export CSV
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">&#x1F4DC;</div>
+      <h3>No validation runs yet</h3>
+      <p style="margin-top: 0.25rem;">Upload a CSV file or download the sample dataset to test error detection.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

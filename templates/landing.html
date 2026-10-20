@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}DataCheck &mdash; Data Import Error Detection and Validation System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="landing-hero animate-fade-in">
+  <div class="landing-pill">
+    <span>&#x1F6E1;</span>
+    <span>Automated Pre-Import Data Integrity Firewall</span>
+  </div>
+
+  <h1 class="landing-title">
+    <span class="landing-title-highlight">DataCheck</span>
+  </h1>
+
+  <p class="landing-subtitle">
+    Data Import Error Detection and Validation System
+  </p>
+
+  <p class="landing-description">
+    Ensure your data is accurate, consistent, and ready for use. Detect errors in your datasets before importing them.
+  </p>
+
+  <div class="landing-actions animate-fade-in animate-delay-1">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-hero">
+      <span>Get Started</span>
+      <span style="font-size: 1.15rem;">&rarr;</span>
+    </a>
+    <a href="{{ url_for('download_sample') }}" class="btn btn-hero-outline" title="Download sample CSV for testing">
+      <span>&#x2913; Download Sample CSV</span>
+    </a>
+  </div>
+</section>
+
+<!-- Features Grid Section -->
+<section class="features-section animate-fade-in animate-delay-2">
+  <div class="features-header">
+    <h2>Core Validation Capabilities</h2>
+    <p>Algorithmic data cleaning and integrity checks designed for relational databases.</p>
+  </div>
+
+  <div class="features-grid">
+    <!-- Feature 1: Missing Value Detection -->
+    <div class="feature-card">
+      <div class="feature-icon-box">&#x2757;</div>
+      <h3 class="feature-title">Missing Value Detection</h3>
+      <p class="feature-desc">
+        Instantly identifies blank cells, empty strings, and null fields across all required attributes so incomplete records never slip through.
+      </p>
+    </div>
+
+    <!-- Feature 2: Duplicate Record Detection -->
+    <div class="feature-card">
+      <div class="feature-icon-box">&#x1F504;</div>
+      <h3 class="feature-title">Duplicate Record Detection</h3>
+      <p class="feature-desc">
+        Detects primary key ID collisions as well as identical full-row duplicates using high-performance O(1) hash set algorithms.
+      </p>
+    </div>
+
+    <!-- Feature 3: Invalid Data Detection -->
+    <div class="feature-card">
+      <div class="feature-icon-box">&#x26A0;</div>
+      <h3 class="feature-title">Invalid Data Detection</h3>
+      <p class="feature-desc">
+        Catches type mismatches (text in numeric fields), invalid RFC email syntax, non-standard date formats, and out-of-range anomalies.
+      </p>
+    </div>
+
+    <!-- Feature 4: Detailed Validation Reports -->
+    <div class="feature-card">
+      <div class="feature-icon-box">&#x1F4CA;</div>
+      <h3 class="feature-title">Detailed Validation Reports</h3>
+      <p class="feature-desc">
+        Renders an interactive diagnostics table with row numbers, column names, bad values, and suggested fixes, with instant CSV report export.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="landing-cta animate-fade-in animate-delay-2">
+  <h2>Ready to Audit Your Dataset?</h2>
+  <p>Upload your CSV file now and receive an instant, comprehensive data integrity analysis with actionable remediation suggestions.</p>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-hero" style="background: #ffffff; color: #4f46e5;">
+    <span>Get Started Now</span>
+    <span>&rarr;</span>
+  </a>
+</section>
+{% endblock %}
