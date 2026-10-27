@@ -79,29 +79,16 @@ class DataCheckTestCase(unittest.TestCase):
         self.assertEqual(res_clean['total_errors'], 0)
         self.assertEqual(len(res_clean['errors']), 0)
 
-    def test_landing_page(self):
-        """Test that the root URL ('/') renders the attractive landing page with all required content."""
+    def test_homepage_redirects_to_dashboard(self):
+        """The public root URL should open the actual CSV validation dashboard."""
         res = self.client.get('/')
-        self.assertEqual(res.status_code, 200)
-        
-        # 1. Very large title "DataCheck"
-        self.assertIn(b"DataCheck", res.data)
-        
-        # 2. Subtitle
-        self.assertIn(b"Data Import Error Detection and Validation System", res.data)
-        
-        # 3. Exact Description
-        self.assertIn(b"Ensure your data is accurate, consistent, and ready for use. Detect errors in your datasets before importing them.", res.data)
-        
-        # 4. Short list of 4 features
-        self.assertIn(b"Missing Value Detection", res.data)
-        self.assertIn(b"Duplicate Record Detection", res.data)
-        self.assertIn(b"Invalid Data Detection", res.data)
-        self.assertIn(b"Detailed Validation Reports", res.data)
-        
-        # 5. Prominent "Get Started" button linking to dashboard
-        self.assertIn(b"Get Started", res.data)
-        self.assertIn(b"/dashboard", res.data)
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(res.headers.get('Location'), '/dashboard')
+
+        dashboard_res = self.client.get('/dashboard')
+        self.assertEqual(dashboard_res.status_code, 200)
+        self.assertIn(b"Upload CSV File for Validation", dashboard_res.data)
+        self.assertIn(b"Validate Dataset", dashboard_res.data)
 
     def test_dashboard_and_upload(self):
         """Test dashboard page, CSV upload processing, results, export, history, and deletion."""
