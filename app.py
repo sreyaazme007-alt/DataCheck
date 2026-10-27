@@ -19,9 +19,10 @@ from werkzeug.utils import secure_filename
 
 # --- Application Configuration ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'datacheck-cse-secret-key-2026'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'datacheck-local-development-key-change-in-production')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload limit
-DATABASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datacheck.db')
+DATABASE_PATH = os.environ.get('DATABASE_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datacheck.db'))
+os.makedirs(os.path.dirname(os.path.abspath(DATABASE_PATH)), exist_ok=True)
 SAMPLE_CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sample_data.csv')
 
 # Predefined Valid Schema Constraints for Academic Records
@@ -640,5 +641,6 @@ def delete_run(run_id):
 # --- Application Entrypoint ---
 if __name__ == '__main__':
     init_db()
-    print("DataCheck Server starting at http://127.0.0.1:5000")
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    port = int(os.environ.get('PORT', '5000'))
+    print(f"DataCheck Server starting on port {port}")
+    app.run(debug=False, host='0.0.0.0', port=port)
