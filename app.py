@@ -379,7 +379,7 @@ def validate_csv(content_str):
 # --- Web Routes ---
 @app.route('/')
 def landing():
-    """Open the main CSV validation dashboard at the website root."""
+    """Send visitors to the main CSV validation dashboard."""
     return redirect(url_for('dashboard'))
 
 
@@ -618,7 +618,7 @@ def download_sample():
     """Serves the sample dataset containing valid and intentional invalid records."""
     if not os.path.exists(SAMPLE_CSV_PATH):
         flash("Sample CSV file not found on server.", "danger")
-        return redirect(url_for('index'))
+        return redirect(url_for('dashboard'))
     return send_file(
         SAMPLE_CSV_PATH,
         mimetype='text/csv',
