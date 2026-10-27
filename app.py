@@ -379,8 +379,8 @@ def validate_csv(content_str):
 # --- Web Routes ---
 @app.route('/')
 def landing():
-    """Attractive landing page introducing DataCheck."""
-    return render_template('landing.html', active_page='landing')
+    """Open the main CSV validation dashboard at the website root."""
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/dashboard')
